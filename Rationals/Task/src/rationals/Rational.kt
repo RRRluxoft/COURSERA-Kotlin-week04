@@ -38,10 +38,6 @@ fun main() {
             "1824032980372593840238402384283940832058".toBigInteger() == 1 divBy 2)
 }
 
-operator fun Any.contains(rational: Rational): Boolean {
-    TODO("not implemented")
-}
-
 fun String.toRational(): Rational {
     val n = this.substringBefore('/').toBigInteger()
     val d = this.substringAfter('/').toBigInteger()
@@ -52,7 +48,8 @@ infix fun Number.divBy(d: Number): Rational {
     return Rational(BigInteger.valueOf(this.toLong()), BigInteger.valueOf(d.toLong()))
 }
 
-class Rational(n: BigInteger, d: BigInteger): Number() {
+class Rational(n: BigInteger, d: BigInteger): Number(), Comparable<Rational> {
+
     override fun toByte(): Byte {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -119,15 +116,18 @@ class Rational(n: BigInteger, d: BigInteger): Number() {
         return Rational(n * other.d, d * other.n)
     }
 
-    operator fun rangeTo(other: Rational): Any {
-        TODO("not implemented")
+    operator fun rangeTo(other: Rational): ClosedRange<Rational> {
+        return object : ClosedRange<Rational> {
+            override val endInclusive: Rational = other
+            override val start: Rational = this@Rational
+        }
     }
 
     operator fun unaryMinus(): Rational {
         return Rational(n.negate(), d)
     }
 
-    operator fun compareTo(other: Rational): Int {
+    override operator fun compareTo(other: Rational): Int {
         val mNum = n * other.d;
         val oNum = other.n * d;
         return mNum.compareTo(oNum)
