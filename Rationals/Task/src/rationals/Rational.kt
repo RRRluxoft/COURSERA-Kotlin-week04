@@ -39,43 +39,49 @@ fun main() {
 }
 
 fun String.toRational(): Rational {
-    val n = this.substringBefore('/').toBigInteger()
-    val d = this.substringAfter('/').toBigInteger()
-    return Rational(n, d)
+    return if (this.contains('/')) {
+        val n = this.substringBefore('/').toBigInteger()
+        val d = this.substringAfter('/').toBigInteger()
+        Rational(n, d)
+    } else Rational(this.toBigInteger())
+}
+
+fun Number.toRational(): Rational {
+    return Rational(this.toLong().toBigInteger())
 }
 
 infix fun Number.divBy(d: Number): Rational {
-    return Rational(BigInteger.valueOf(this.toLong()), BigInteger.valueOf(d.toLong()))
+    return Rational(this.toLong().toBigInteger(), d.toLong().toBigInteger())
 }
 
 class Rational(n: BigInteger, d: BigInteger): Number(), Comparable<Rational> {
 
     override fun toByte(): Byte {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return (n / d) as Byte
     }
 
     override fun toChar(): Char {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return (n / d) as Char
     }
 
     override fun toDouble(): Double {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return (n.toDouble() / d.toDouble())
     }
 
     override fun toFloat(): Float {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return (n.toFloat() / d.toFloat())
     }
 
     override fun toInt(): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return (n.toInt() / d.toInt())
     }
 
     override fun toLong(): Long {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return (n.toLong() / d.toLong())
     }
 
     override fun toShort(): Short {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return (n / d) as Short
     }
 
     val n: BigInteger
@@ -83,8 +89,13 @@ class Rational(n: BigInteger, d: BigInteger): Number(), Comparable<Rational> {
     init {
         require(d != BigInteger.ZERO)
         val g = gcd(n.abs(), d.abs())
-        this.n = n.divide(g)
-        this.d = d / g
+        if (d < BigInteger.ZERO) {
+            this.n = -n.div(g)
+            this.d = (d.abs()).div(g)
+        } else {
+            this.n = n.div(g)
+            this.d = d.div(g)
+        }
     }
     constructor(n: BigInteger) : this(n, BigInteger.ONE)
 
@@ -92,10 +103,6 @@ class Rational(n: BigInteger, d: BigInteger): Number(), Comparable<Rational> {
 
     private fun gcd(a: BigInteger, b: BigInteger): BigInteger = if (b == BigInteger.ZERO) a
     else gcd(b, a % b)
-//    val g = gcd(n.absoluteValue, d.absoluteValue)
-//    val number = n / g
-//    val denom = d / g
-
 
     operator fun plus(other: Rational): Rational {
         return Rational(n * other.d + d * other.n, d * other.d)
@@ -133,13 +140,9 @@ class Rational(n: BigInteger, d: BigInteger): Number(), Comparable<Rational> {
         return mNum.compareTo(oNum)
     }
 
-
-
     override fun toString(): String {
         return if (this.d == BigInteger.ONE)
             "" + this.n
-        else if (this.d < BigInteger.ZERO)
-            "" + this.n.negate() + "/" + this.d.abs()
         else "" + this.n + "/" + this.d
     }
 
